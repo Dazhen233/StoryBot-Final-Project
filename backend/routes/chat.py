@@ -53,3 +53,4 @@ def chat():
     update_memory(user_id, user_text, story)
 
     return jsonify({"reply": story, "image_url": image_url, "audio_url": audio_url})
+
