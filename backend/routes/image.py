@@ -16,4 +16,4 @@ def generate_image_route():
         return jsonify({"image_url": image_url})
 
     except Exception as e:
-        return jsonify({"error": "图片生成失败"}), 500
+        return jsonify({"error": str(e)}), 500

@@ -4,7 +4,6 @@ import os
 
 audio_blueprint = Blueprint('audio', __name__)
 
-# 从环境变量中加载 OpenAI API Key
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def generate_audio_openai(text: str, user_id: str):

@@ -89,6 +89,37 @@ sequenceDiagram
     Celery-->>-Backend: 返回结果
     Backend-->>-Frontend: 返回完整响应
 
+知识图谱结构：
+graph TD
+    A[分类节点] --> B[具体词汇]
+    C[词汇属性] --> B
+    B --> D[相关词汇]
+    D --> E[应用场景]
+
+拓展：
+集成nlp工具
+import spacy
+nlp = spacy.load("en_core_web_sm")
+
+def _extract_keywords(self, text):
+    doc = nlp(text)
+    return [chunk.text for chunk in doc.noun_chunks]
+
+实时的图谱更新
+def add_real_time_data(self, interaction):
+    """实时添加新数据"""
+    self._process_interaction(interaction)
+    # 触发增量学习
+    self._update_centrality_scores()
+
+个性化推荐增强
+def personalized_recommend(self, learning_style: str):
+    """根据学习风格调整推荐策略"""
+    if learning_style == "visual":
+        return self._select_visual_topics()
+    elif learning_style == "auditory":
+        return self._select_audio_topics()
+
 @router.post("/generate")
 async def generate_story(
     request: StoryRequest,  # 包含用户ID、语音文本、选择路径
