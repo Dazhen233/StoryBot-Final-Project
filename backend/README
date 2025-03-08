@@ -130,3 +130,5 @@ async def generate_story(
     background_tasks.add_task(initiate_image_rendering, request)
     background_tasks.add_task(prefetch_audio_resources, request)
     return {"status": "processing"}
+
+uvicorn main:app --reload    
