@@ -1,23 +1,29 @@
 from fastapi import APIRouter, BackgroundTasks, HTTPException
 from pydantic import BaseModel
-from app.core.agents.story_agent import generate_story
-from app.core.rendering.image_controller import generate_image
-from app.core.rendering.tts_controller import generate_tts
+from app.core.agents.story_agent import process_with_langchain
+import json
 
 router = APIRouter()
 
-class StoryRequest(BaseModel):
+class UserRequest(BaseModel):
     user_id: str
-    character_name: str
-    character_source: str
-    current_state: str
+    user_input: str
 
-@router.post("/generate")
-async def generate_story_endpoint(request: StoryRequest, background_tasks: BackgroundTasks):
+@router.post("/process")
+async def process_request(request: UserRequest, background_tasks: BackgroundTasks):
     try:
-        story_data = generate_story(request.character_name, request.character_source, request.current_state)
-        background_tasks.add_task(generate_image, story_data['keywords'])
-        background_tasks.add_task(generate_tts, story_data['story_text'])
-        return {"status": "processing", "story_data": story_data}
+        response_data = process_with_langchain(request.user_id, request.user_input)
+        response_json = json.loads(response_data)
+        response_text = response_json["response_text"]
+        marker = response_json["marker"]
+
+        if marker == "[STORY]":
+            return {
+                "response": response_text,
+                "audio_url": response_json["audio_url"],
+                "image_url": response_json["image_url"]
+            }
+        else:
+            return {"response": response_text, "audio_url": response_json["audio_url"]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

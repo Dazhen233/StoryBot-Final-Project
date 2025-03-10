@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from app.api.routes import story, interaction
+from fastapi.staticfiles import StaticFiles
+from app.api.routes import story
 from app.core.memory.session_manager import create_tables
 import logging
 from contextlib import asynccontextmanager
+import os
 
 # 设置日志记录
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +21,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(story.router, prefix="/story", tags=["story"])
-app.include_router(interaction.router, prefix="/interaction", tags=["interaction"])
+
+# 提供静态文件服务
+if not os.path.exists("static"):
+    os.makedirs("static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def read_root():

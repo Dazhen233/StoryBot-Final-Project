@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine, Column, Integer, String, TIMESTAMP, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from datetime import datetime
 
 DATABASE_URL = "sqlite:///./storybot.db"
 
@@ -20,6 +21,13 @@ class ConversationMemory(Base):
     user_id = Column(String, ForeignKey("users.user_id"))
     message = Column(String)
     response = Column(String)
+    created_at = Column(TIMESTAMP, default=datetime.utcnow)
+
+class StoryState(Base):
+    __tablename__ = "story_state"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.user_id"))
+    current_state = Column(String)
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
 
 class Image(Base):
