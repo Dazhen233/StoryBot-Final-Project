@@ -11,6 +11,36 @@
 故事创作和tts用openai的api
 图片创作并保持角色一致性用https://platform.stability.ai/的api,初期使用ControlNet， 跑通之后再考虑更换为LoRA技术
 
+框架设计：
+✅ OpenAI Assistants API → 用一个 AI Orchestration LLM 管理多个 function calls
+✅ AutoGPT → 用 LLM 控制不同任务代理，自己决定执行顺序
+✅ HuggingGPT → 用一个 LLM 管理 Hugging Face 上的不同模型
+
+我们可以参考 HuggingGPT 的思路：
+
+控制 LLM 解析用户输入，决定调用哪个子任务（故事、图片、语音）。
+子任务 LLM 只专注于自己的任务，比如 GPT-4 生成故事，Stable Diffusion 生成图片，ElevenLabs 生成语音。
+结果可以再返回给控制 LLM，由它决定如何组合这些内容，并引导孩子继续互动。
+
+本架构需要多个 LLM 维护各自的上下文，特别是控制 LLM 和故事 LLM，它们的上下文需要独立管理。
+如果不做处理，控制 LLM 可能会把所有历史信息混在一起，导致故事 LLM 失去一致性，或者控制 LLM 误解用户输入。
+使用 LangChain 的 Multi-Memory 机制
+LangChain 支持多个独立的 Memory（记忆模块），可以给不同的 LLM 维护各自的上下文。
+这里的核心思路是：
+
+控制 LLM 只保存任务管理上下文（用户的意图、当前状态）。
+故事 LLM 维护自己的独立上下文（完整的故事内容）。
+用户的输入只影响相关 LLM（比如用户选了角色，故事 LLM 才更新上下文，而控制 LLM 不需要）。
+
+用户输入默认给控制 LLM。
+如果是“继续故事”，就交给故事 LLM。
+用户的输入不会影响错误的 LLM 上下文！
+✅ 控制 LLM 只存储“任务管理”信息，不存故事内容。
+✅ 故事 LLM 维护自己的独立上下文，保证故事的连贯性。
+✅ 用户的输入通过意图识别，分配到合适的 LLM（控制 LLM / 故事 LLM）。
+✅ 使用 LangChain Memory 管理多个 LLM 的独立上下文，避免互相干扰。
+
+
 架构采用如下方式：
 graph LR
     A[前端React] --> B[API Gateway]
@@ -132,3 +162,8 @@ async def generate_story(
     return {"status": "processing"}
 
 uvicorn main:app --reload    
+
+curl -X POST "http://localhost:8000/story/process" -H "Content-Type: application/json" -d '{
+  "user_id": "user123",
+  "user_input": "Thomas"
+}'

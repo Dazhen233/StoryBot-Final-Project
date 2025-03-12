@@ -5,6 +5,10 @@ from app.core.memory.session_manager import create_tables
 import logging
 from contextlib import asynccontextmanager
 import os
+from dotenv import load_dotenv
+
+# 加载 .env 文件中的环境变量
+load_dotenv()
 
 # 设置日志记录
 logging.basicConfig(level=logging.INFO)

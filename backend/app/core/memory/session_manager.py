@@ -10,6 +10,7 @@ def create_tables():
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id TEXT NOT NULL UNIQUE,
+            character_name TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
@@ -53,12 +54,27 @@ def create_tables():
     conn.commit()
     conn.close()
 
-def add_user(user_id):
+def add_user(user_id, character_name=None):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO users (user_id) VALUES (?)", (user_id,))
+    cursor.execute("INSERT INTO users (user_id, character_name) VALUES (?, ?)", (user_id, character_name))
     conn.commit()
     conn.close()
+
+def update_user_character(user_id, character_name):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE users SET character_name = ? WHERE user_id = ?", (character_name, user_id))
+    conn.commit()
+    conn.close()
+
+def get_user_character(user_id):
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT character_name FROM users WHERE user_id = ?", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
 
 def add_conversation_memory(user_id, message, response):
     conn = sqlite3.connect(DATABASE)
@@ -103,3 +119,11 @@ def add_audio_response(user_id, audio_url):
     cursor.execute("INSERT INTO audio_responses (user_id, audio_url) VALUES (?, ?)", (user_id, audio_url))
     conn.commit()
     conn.close()
+
+def get_all_conversation_memory():
+    conn = sqlite3.connect(DATABASE)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM conversation_memory ORDER BY created_at")
+    result = cursor.fetchall()
+    conn.close()
+    return result
