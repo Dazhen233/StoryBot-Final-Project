@@ -3,8 +3,8 @@ if __name__ == "__main__":
     # 测试 process_user_input 函数
     user_id = "test_user"
     user_input = "我想和Thomas一起去冒险！"
-    intent, character, next_action = process_user_input(user_id, user_input)
-    print(f"Intent: {intent}, Character: {character}, Next Action: {next_action}")
+    intent, character, next_action, reply = process_user_input(user_id, user_input)
+    print(f"Intent: {intent}, Character: {character}, Next Action: {next_action}, reply: {reply}")
 
     # 测试 generate_story 函数
     story_data = generate_story(user_id, "thomas", "", "")

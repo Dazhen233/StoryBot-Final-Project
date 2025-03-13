@@ -122,10 +122,19 @@ def generate_story(user_id, user_input, character_name, difficulty_level=3):
     #    "conversation_history": conversation_history
     #})
     
-    response = llm.invoke(prompt)
-    story_data = {'story_text': response}
-    add_story_state(user_id, "child reply:"+user_input+" "+response)
+    response = llm.invoke(prompt,max_tokens=1000)
+    try:
+        # 尝试将字符串转换为 JSON（Python 字典）
+        response_json = json.loads(response)
+        story_data = {'story_text': response_json.get("Story")+"-->"+response_json.get("Question")}
+        print("story JSON 转换成功！")
+    except json.JSONDecodeError as e:
+        # 如果转换失败，捕获异常并打印错误信息
+        print("story JSON 转换失败！")
+        print(f"错误信息：{e}")
+        story_data = {'story_text': response}
 
+    add_story_state(user_id, "child reply:"+user_input+" "+response)
     return story_data
 
 

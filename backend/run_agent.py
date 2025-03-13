@@ -1,3 +1,4 @@
+# run_agent.py
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from app.api.routes import story
@@ -33,10 +34,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, World!"}
+    return {"message": "Hello, Welcome to StoryBot!"}
 
 if __name__ == "__main__":
     import uvicorn
     logger.info("Starting the server...")
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("run_agent:app", host="0.0.0.0", port=8000, reload=True, log_level="debug")
     logger.info("Server started successfully.")
