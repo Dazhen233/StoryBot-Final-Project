@@ -155,7 +155,7 @@ def process_with_langchain(user_id, user_input):
     intent, character, next_action, reply = process_user_input(user_id, user_input)
     print(f"Intent: ====> {intent}, Character: {character}, Next Action: {next_action}, reply :{reply}")
 
-    if intent == "choose_character" :
+    if intent == "choose_character" or intent == "continue_story":
         # 更新用户选择的角色
         update_user_character(user_id, character)
         
