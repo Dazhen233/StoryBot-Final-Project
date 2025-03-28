@@ -1,0 +1,49 @@
+.fullPageBackground {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1; /* 让背景保持在最底层 */
+}
+
+.background {
+    width: 1920px;
+    height: 1080px;
+    background-size: contain; /* 或 cover */
+    background-position: center;
+    background-repeat: no-repeat;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.speakButton {
+    position: absolute;
+    bottom: 150px;
+    right: 880px;
+    width: 200px;
+    height: auto;
+    cursor: pointer;
+    transition: filter 0.1s ease-in-out;;
+}
+
+.respond-image {
+    width: 400px; /* 适当调整大小 */
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-in-out;
+}
+
+.speakButton:hover {
+    filter: brightness(1.1);
+}
+
+.speakButton:active {
+    filter: brightness(0.5);
+}
