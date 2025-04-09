@@ -50,7 +50,7 @@ def process_user_input(user_id, user_input):
     #prompt_template = PromptTemplate(
     #    input_variables=["user_input", "conversation_history"],# "current_state"], 
     #    template=prompt
-    #)
+    #)  
     # 使用 `|` 代替 LLMChain
     #chain = prompt_template | llm
     #response = chain.invoke(#{
@@ -60,7 +60,7 @@ def process_user_input(user_id, user_input):
     #}
     #)
     response = llm.invoke(prompt)
-    #print("LLM Info:", llm)
+    print("control agent Info:===>", llm)
 
     if response is None:
         print("\n⚠️ Warning: LLM returned None!\n")
@@ -105,7 +105,9 @@ def generate_story(user_id, user_input, character_name, difficulty_level=3):
         current_state=current_state,
         last_question_answer=user_input
     )
-
+    print("*************")
+    print("prompt:======>", character_name,prompt)
+    print("*************")
     # 创建 PromptTemplate
     #prompt_template = PromptTemplate(
     #    input_variables=["difficulty_level", "character_name", "character_source", "current_state", "conversation_history"], 
@@ -140,13 +142,15 @@ def generate_story(user_id, user_input, character_name, difficulty_level=3):
 
 def generate_image_task(story_text, character_name):
     """生成故事对应的图片"""
-    character_image_path = f"c:/Users/Steven/Downloads/StoryBot-Final-Project/backend/character_images/{character_name.lower()}.png"
+    print("DBG===> starting generate image")
+    character_image_path = f"character_images/{character_name.lower()}.png"
     return generate_image(story_text, character_image_path)
 
 
 def generate_tts_task(response_text):
     """生成故事的语音"""
     from app.core.rendering.tts_controller import generate_tts
+    print("DBG===> starting generate tts")
     return generate_tts(response_text, voice="fable")
 
 
@@ -155,18 +159,18 @@ def process_with_langchain(user_id, user_input):
     intent, character, next_action, reply = process_user_input(user_id, user_input)
     print(f"Intent: ====> {intent}, Character: {character}, Next Action: {next_action}, reply :{reply}")
 
-    if intent == "choose_character" or intent == "continue_story":
+    if True: # intent == "choose_character":
         # 更新用户选择的角色
-        update_user_character(user_id, character)
+        update_user_character(user_input, character)
         
-        # 生成故事    user_input, character_name, difficulty_level=5
-        story_data = generate_story(user_id, "", character)
+        # 生成故事    user_id, user_input, character_name, difficulty_level=5
+        story_data = generate_story(user_id, user_input, character)
         print(f"Story Text: {story_data['story_text']}")
 
         # 生成图片 & 语音
         story_data['image_url'] = generate_image_task(story_data["story_text"], character)
         story_data['audio_url'] = generate_tts_task(story_data["story_text"])
-
+        print("DBG==> finish generate image and tts")
         return story_data
     elif intent == "continue_story":
         character_name = get_user_character(user_id) or "Cinderella"

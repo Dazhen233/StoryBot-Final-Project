@@ -164,6 +164,6 @@ async def generate_story(
 uvicorn main:app --reload    
 
 curl -X POST "http://localhost:8000/story/process" -H "Content-Type: application/json" -d '{
-  "user_id": "user123",
-  "user_input": "Thomas"
+  "user_id": "userabc",
+  "user_input": "Snow White Princess"
 }'
